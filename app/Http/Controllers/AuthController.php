@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Users;
+use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
@@ -14,7 +14,7 @@ class AuthController extends Controller
         $fields = $request->validate([
             'name' => 'required|string|max:100',
             'email' => 'required|string|unique:users,email',
-            'password' => 'required|string|confimed|min:6'
+            'password' => 'required|string|confirmed|min:6'
         ]);
 
         $user = User::create([
@@ -26,8 +26,8 @@ class AuthController extends Controller
         $token = $user->createToken('tokenku')->plainTextToken;
 
         $response = [
-            'user' => $user,
-            'token' => $token
+        'user' => $user,
+        'token' => $token
         ];
 
         return response($response, 201);
@@ -40,32 +40,39 @@ class AuthController extends Controller
             'password' => 'required|string'
         ]);
 
-        // Check email
+        //check email
         $user = User::where('email', $fields['email'])->first();
-
-        // Check password
-        if (!$user || !Hash::check($fields['password'], $user->password)) {
+       
+        //check password
+        if (!$user || !Hash::check($fields['password'], $user->password)){
             return response([
-                'message' => 'unauthorized'
+             'massage' => 'unauthorized'
             ], 401);
-    }
+        }
 
-    $token = $user->createToken('tokenku')->plainTextToken;
 
-    $response = [
+        $token = $user->createToken('tokenku')->plainTextToken;
+
+        $response = [
         'user' => $user,
         'token' => $token
-    ];
+        ];
 
-    return response($response, 201);
+        return response($response, 201);
     }
 
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();
 
         return [
-            'message' => 'logged out'
+            'massage' => 'Logged out'
         ];
     }
 }
